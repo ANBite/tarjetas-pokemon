@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
+import "./App.css"; 
 
 function App() {
   const [pokemons, setPokemons] = useState([]);
 
   useEffect(() => {
     async function fetchPokemons() {
-      const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=40"); //Busca los primeros 40 Pokémon
+      // Muestra los primeros 151 pokémones (Generación 1)
+      const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151"); 
       const data = await response.json();
 
       const details = await Promise.all(
@@ -21,18 +23,27 @@ function App() {
   }, []);
 
   return (
-    <div className="grid grid-cols-3 gap-4 p-4">
-      {pokemons.map((p) => (
-        <div key={p.id} className="border rounded-xl p-4 shadow-lg text-center">
-          <h2 className="text-xl font-bold capitalize">{p.name}</h2>
-          <img
-            src={p.sprites.other["official-artwork"].front_default}
-            alt={p.name}
-            className="mx-auto h-32"
-          />
-          <p>Tipo: {p.types.map((t) => t.type.name).join(", ")}</p>
-        </div>
-      ))}
+    <div className="app">
+      <h1 className="title">Tarjetas Pokémon</h1>
+
+      <div className="grid">
+        {pokemons.map((p) => (
+          <div key={p.id} className="card">
+            <div className="card-image">
+              <img
+                src={p.sprites.other["official-artwork"].front_default}
+                alt={p.name}
+              />
+            </div>
+            <p className="card-name">
+              {p.name} <br />
+              <span className="card-type">
+                {p.types.map((t) => t.type.name).join(", ")}
+              </span>
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
