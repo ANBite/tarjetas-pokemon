@@ -1,35 +1,40 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [pokemons, setPokemons] = useState([]);
+
+  useEffect(() => {
+    async function fetchPokemons() {
+      const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=40"); //Busca los primeros 40 Pokémon
+      const data = await response.json();
+
+      const details = await Promise.all(
+        data.results.map(async (p) => {
+          const res = await fetch(p.url);
+          return await res.json();
+        })
+      );
+
+      setPokemons(details);
+    }
+    fetchPokemons();
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="grid grid-cols-3 gap-4 p-4">
+      {pokemons.map((p) => (
+        <div key={p.id} className="border rounded-xl p-4 shadow-lg text-center">
+          <h2 className="text-xl font-bold capitalize">{p.name}</h2>
+          <img
+            src={p.sprites.other["official-artwork"].front_default}
+            alt={p.name}
+            className="mx-auto h-32"
+          />
+          <p>Tipo: {p.types.map((t) => t.type.name).join(", ")}</p>
+        </div>
+      ))}
+    </div>
+  );
 }
 
-export default App
+export default App;
